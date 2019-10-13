@@ -585,7 +585,7 @@ kern_return_t SMCPrintFans(void)
                 printf("    Mode         : forced\n");
         }
         else {
-            sprintf(key, "F%dMd", i);
+            sprintf(key, "F%cMd", fannum[i]);
             SMCReadKey(key, &val);
             if (getFloatFromVal(val))
                 printf("    Mode         : forced\n");

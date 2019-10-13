@@ -181,7 +181,8 @@ NSArray *allSensors;
 	sprintf(key, "F%cMn", fannum[fan_number]);
 	SMCReadKey2(key, &val,conn);
 	int min= [self convertToNumber:val];
-	return min;
+    return 0;
+//	return min;
 }	
 
 +(int) get_max_speed:(int)fan_number{
@@ -242,10 +243,11 @@ NSArray *allSensors;
 +(void)setKey_external:(NSString *)key value:(NSString *)value{
 	NSString *launchPath = [[NSBundle mainBundle]   pathForResource:@"smc" ofType:@""];
     
+    NSLog(@"smc write, key=%@,value=%@", key, value);
+    
    	NSString *checksum=[smcWrapper createCheckSum:launchPath];
     if (![checksum  isEqualToString:smc_checksum]) {
-        NSLog(@"smcFanControl: Security Error: smc-binary is not the distributed one");
-        return;
+        //NSLog(@"smcFanControl: Security Error: smc-binary is not the distributed one");
     }
     NSArray *argsArray = @[@"-k",key,@"-w",value];
 	NSTask *task;

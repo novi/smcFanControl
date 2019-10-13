@@ -540,6 +540,7 @@ NSUserDefaults *defaults;
 	[FanControl setRights];
 	[FavoritesController setSelectionIndex:cIndex];
     
+    //NSLog(@"computer model %@", [MachineDefaults computerModel]);
     if ([[MachineDefaults computerModel] rangeOfString:@"MacBookPro15"].location != NSNotFound) {
         for (i=0;i<[[FavoritesController arrangedObjects][cIndex][PREF_FAN_ARRAY] count];i++) {
             [smcWrapper setKey_external:[NSString stringWithFormat:@"F%dMd",i] value:@"01"];
@@ -548,10 +549,21 @@ NSUserDefaults *defaults;
             //NSString str_val = ;
             [smcWrapper setKey_external:[NSString stringWithFormat:@"F%dTg",i] value:[NSString stringWithFormat:@"%02x%02x%02x%02x",vals[0],vals[1],vals[2],vals[3]]];
         }
+    } else if ([[MachineDefaults computerModel] rangeOfString:@"Xserve"].location != NSNotFound) {
+        // Xserve
+        [smcWrapper setKey_external:@"FS! " value:@"ffff"];
+        for (i=0;i<[[FavoritesController arrangedObjects][cIndex][PREF_FAN_ARRAY] count];i++) {
+            float f_val = [[FanController arrangedObjects][i][PREF_FAN_SELSPEED] floatValue];
+            uint16 u_val = f_val;
+            uint8 *vals = (uint8*)&u_val;
+            // consider that fan target value type is uint16
+            [smcWrapper setKey_external:[NSString stringWithFormat:@"F%cTg",fannum[i]] value:[NSString stringWithFormat:@"%02x%02x", vals[1],vals[0] ]];
+            NSLog(@"alternate value = %@", [[FanController arrangedObjects][i][PREF_FAN_SELSPEED] tohex]);
+        }
     }
     else {
         for (i=0;i<[[FavoritesController arrangedObjects][cIndex][PREF_FAN_ARRAY] count];i++) {
-            [smcWrapper setKey_external:[NSString stringWithFormat:@"F%dMn",i] value:[[FanController arrangedObjects][i][PREF_FAN_SELSPEED] tohex]];
+            [smcWrapper setKey_external:[NSString stringWithFormat:@"F%cMn",fannum[i]] value:[[FanController arrangedObjects][i][PREF_FAN_SELSPEED] tohex]];
         }
     }
     
@@ -675,7 +687,7 @@ NSUserDefaults *defaults;
     error = nil;
     if ([[MachineDefaults computerModel] rangeOfString:@"MacBookPro15"].location != NSNotFound) {
         for (int i=0;i<[[FavoritesController arrangedObjects][0][PREF_FAN_ARRAY] count];i++) {
-            [smcWrapper setKey_external:[NSString stringWithFormat:@"F%dMd",i] value:@"00"];
+            [smcWrapper setKey_external:[NSString stringWithFormat:@"F%cMd",fannum[i]] value:@"00"];
         }
     }
 
